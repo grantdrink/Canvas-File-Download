@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="UTF-8" />
+  <title>Canvas File Downloader</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      width: 300px;
+      background: #f8f9fa;
+      color: #333;
+    }
+
+    h1 {
+      font-size: 18px;
+      margin-bottom: 12px;
+      text-align: center;
+      color: #2c3e50;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px 0;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    #status {
+      margin-top: 12px;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    footer {
+      margin-top: 16px;
+      font-size: 12px;
+      color: #999;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Canvas Downloader</h1>
+  <button id="runScript">📥 Download Course Files</button>
+  <div id="status">Checking login...</div>
+  <footer>LearnSpace - Better to know</footer>
+
+  <script src="/src/scripts/index.js" type="module"></script>
+</body>
+</html>
