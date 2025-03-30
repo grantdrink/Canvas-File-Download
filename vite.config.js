@@ -13,7 +13,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        popup: resolve(__dirname, '/index.html'),
+        index: resolve(__dirname, '/index.html'),
         scrape: resolve(__dirname, 'src/scripts/scrape.js'),
         background: resolve(__dirname, 'src/scripts/background.js'),
         zipper: resolve(__dirname, 'src/scripts/zipper.js')
