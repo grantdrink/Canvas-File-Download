@@ -54,9 +54,9 @@ async function handleZipping(allDownloads) {
                 const response = await fetchFileFromBackground(fileInfo.href);
                 if (!response?.success) throw new Error(response?.error || 'Unknown fetch error');
 
-                const arrayBuffer = base64ToArrayBuffer(response.blob);
+                const arrayBuffer = base64ToArrayBuffer(response.base64);
                 if (!arrayBuffer || arrayBuffer.byteLength === 0) {
-                    console.warn(`Zipper: Empty file data for ${fileInfo.filename}. Skipping.`);
+                    console.warn(`Zipper: Empty or invalid file data received for ${fileInfo.filename}. Skipping.`);
                     totalErrors++; continue;
                 }
                 
@@ -89,9 +89,12 @@ async function handleZipping(allDownloads) {
         if (filesAddedToCourseZip > 0) {
             console.log(`Zipper: Generating zip for "${sanitizedCourseName}"...`);
             try {
-                const zipBlob = await zip.generateAsync({ type: 'blob', mimeType: 'application/zip' });
+                const zipBlob = await zip.generateAsync({ 
+                    type: 'blob', 
+                    mimeType: 'application/zip' 
+                }); 
                 console.log(`Zipper: Generated zip size for "${sanitizedCourseName}":`, zipBlob.size);
-                triggerDownload(zipBlob, zipFilename); // Use sanitized course name in zip filename
+                triggerDownload(zipBlob, zipFilename); 
                 totalZippedFiles += filesAddedToCourseZip;
             } catch (zipError) {
                  console.error(`Zipper: Failed zip generation for "${sanitizedCourseName}":`, zipError);
@@ -107,23 +110,29 @@ async function handleZipping(allDownloads) {
     chrome.runtime.sendMessage({ statusUpdate: `🏁 Complete! Zipped ${totalZippedFiles} files. ${totalErrors > 0 ? `${totalErrors} errors.` : ''}` }).catch(()=>{});
 }
 
-// Helper function to trigger the download
+// --- Restore the manual download trigger function --- 
 function triggerDownload(blob, filename) {
+    // (This implementation uses URL.createObjectURL and simulates a click)
+    if (!blob) {
+        console.error("triggerDownload error: blob is null or undefined");
+        return;
+    }
     const zipUrl = URL.createObjectURL(blob);
     const a = document.createElement('a');
+    a.style.display = 'none'; // Hide the link
     a.href = zipUrl;
     a.download = filename;
-    console.log(`Zipper: Initiating download for ${filename}`);
+    console.log(`Zipper: Initiating download for ${filename} using createObjectURL.`);
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     // Revoke the object URL after a short delay to allow the download to start
-    setTimeout(() => URL.revokeObjectURL(zipUrl), 1000);
+    setTimeout(() => URL.revokeObjectURL(zipUrl), 1000); 
 }
 
 // Updated function to request file data AND metadata from background
 async function fetchFileFromBackground(url) {
-    console.log(`Zipper: Requesting fetchFile message for URL: ${url}`);
+    console.log(`Zipper: Requesting fetchFile message for URL: ${url}`); // Corrected template literal
     return new Promise((resolve, reject) => { // Keep reject for clarity here
         chrome.runtime.sendMessage({ action: 'fetchFile', url }, (response) => {
             if (chrome.runtime.lastError) {
@@ -161,3 +170,10 @@ function base64ToArrayBuffer(base64) {
       return null;
   }
 }
+
+/*
+// --- Remove or comment out the saveAs version --- 
+function triggerDownloadWithSaveAs(blob, filename) {
+    // ... saveAs implementation ...
+}
+*/
