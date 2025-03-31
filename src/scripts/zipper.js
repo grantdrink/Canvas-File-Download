@@ -52,9 +52,22 @@ async function handleZipping(allDownloads) {
             try {
                 console.log(`Zipper: Requesting file data for: ${fileInfo.filename} (Href: ${fileInfo.href})`);
                 const response = await fetchFileFromBackground(fileInfo.href);
+                
+                // --- Check for skip flag --- 
+                if (response?.skipped) {
+                    console.warn(`Zipper: Skipping file ${fileInfo.filename} because it was too large (reported by background).`);
+                    // Increment error count or a separate skipped count if desired
+                    totalErrors++; 
+                    continue; // Move to the next file
+                }
+                // --- END Check for skip flag ---
+                
+                // Proceed if not skipped and successful
                 if (!response?.success) throw new Error(response?.error || 'Unknown fetch error');
 
-                const arrayBuffer = base64ToArrayBuffer(response.base64);
+                // Use response.base64
+                const arrayBuffer = base64ToArrayBuffer(response.base64); 
+                
                 if (!arrayBuffer || arrayBuffer.byteLength === 0) {
                     console.warn(`Zipper: Empty or invalid file data received for ${fileInfo.filename}. Skipping.`);
                     totalErrors++; continue;

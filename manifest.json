@@ -5,14 +5,16 @@
     "manifest_version": 3,
     "host_permissions": [
         "https://bostoncollege.instructure.com/*",
-        "https://cdn.inst-fs-iad-prod.inscloudgate.net/*"
+        "https://cdn.inst-fs-iad-prod.inscloudgate.net/*",
+        "https://*.canvas-user-content.com/*"
     ],
     "permissions": [
         "activeTab",
         "scripting",
         "downloads",
         "tabs",
-        "cookies"
+        "cookies",
+        "declarativeNetRequestWithHostAccess"
     ], 
     "action": {
         "default_popup": "index.html"
@@ -35,5 +37,14 @@
             "resources": ["./src/scripts/scrape.js"],
             "matches": ["<all_urls>"]
         }
-    ]
+    ],
+    "declarative_net_request": {
+        "rule_resources": [
+            {
+                "id": "ruleset_1",
+                "enabled": true,
+                "path": "rules.json"
+            }
+        ]
+    }
 }

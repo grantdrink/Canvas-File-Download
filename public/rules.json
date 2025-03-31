@@ -1,0 +1,31 @@
+[
+    {
+      "id": 1,
+      "priority": 1,
+      "action": {
+        "type": "modifyHeaders",
+        "responseHeaders": [
+          {
+            "header": "Access-Control-Allow-Origin",
+            "operation": "set",
+            "value": "chrome-extension://pngbkmgbbnogoeekjjioalkgmkjaijlo"
+          },
+          {
+            "header": "Access-Control-Allow-Methods",
+            "operation": "set",
+            "value": "GET, HEAD, OPTIONS"
+          },
+          {
+             "header": "Access-Control-Allow-Credentials",
+             "operation": "set",
+             "value": "true"
+          }
+        ]
+      },
+      "condition": {
+        "urlFilter": "||canvas-user-content.com",
+        "initiatorDomains": ["pngbkmgbbnogoeekjjioalkgmkjaijlo"],
+        "resourceTypes": ["xmlhttprequest", "main_frame", "sub_frame", "other"]
+      }
+    }
+  ]

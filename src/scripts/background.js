@@ -124,15 +124,42 @@ async function fetchFile(url) {
         const blob = await response.blob();
         log('info', `Created blob size=${blob.size} type=${blob.type}`);
         
-        // Convert blob to base64 to send back via message
+        // Define a maximum size for the Base64 string (e.g., 15 million chars ~ 11MB binary)
+        const MAX_BASE64_LENGTH = 15 * 1024 * 1024; 
+
+        // Convert blob to base64
         const base64String = await blobToBase64(blob);
+
+        if (base64String === null) {
+            // Handle error from blobToBase64 if it couldn't read the blob
+            log('error', `BG: Failed to convert blob to Base64 for ${url}.`);
+            // Treat this as a fetch failure
+            throw new Error('Failed to convert blob to Base64.'); 
+        }
+
+        // --- Check Size --- 
+        if (base64String.length > MAX_BASE64_LENGTH) {
+            log('warn', `BG: File ${url} (Blob size ${blob.size}) resulted in Base64 length ${base64String.length}, exceeding limit ${MAX_BASE64_LENGTH}. Skipping content transfer.`);
+            // Return success=true but indicate skipping due to size
+            return { 
+                success: true, 
+                skipped: true, // Add a flag to indicate skipping
+                error: 'File skipped: too large for messaging',
+                filenameFromHeader: filenameFromHeader, // Still useful for logging
+                contentType: blob.type
+            };
+        }
+        // --- END Check Size ---
+
         log('info', `BG: Fetched OK. Header Filename=${filenameFromHeader || 'null'}, Type=${blob.type || 'N/A'}, Base64 Len=${base64String.length}`);
         
+        // Return full data if size is okay
         return { 
             success: true, 
+            skipped: false, // Explicitly mark as not skipped
             base64: base64String, 
             contentType: blob.type,
-            filenameFromHeader: filenameFromHeader // Send header filename back too
+            filenameFromHeader: filenameFromHeader
         };
 
     } catch (error) {
